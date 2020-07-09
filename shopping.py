@@ -1,5 +1,6 @@
 import csv
 import sys
+from datetime import datetime
 
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
@@ -59,7 +60,34 @@ def load_data(filename):
     labels should be the corresponding list of labels, where each label
     is 1 if Revenue is true, and 0 otherwise.
     """
-    raise NotImplementedError
+    with open("shopping.csv", "r") as infile:
+        reader = csv.DictReader(infile)
+        evidence = []
+        labels = []
+        for line in reader:
+            currEvidence = []
+            currEvidence.append(int(line["Administrative"]))
+            currEvidence.append(float(line["Administrative_Duration"]))
+            currEvidence.append(int(line["Informational"]))
+            currEvidence.append(float(line["Informational_Duration"]))
+            currEvidence.append(int(line["ProductRelated"]))
+            currEvidence.append(float(line["ProductRelated_Duration"]))
+            currEvidence.append(float(line["BounceRates"]))
+            currEvidence.append(float(line["ExitRates"]))
+            currEvidence.append(float(line["PageValues"]))
+            currEvidence.append(float(line["SpecialDay"]))
+            currEvidence.append(datetime.strptime(line["Month"][:3], "%b").month - 1)
+            currEvidence.append(int(line["OperatingSystems"]))
+            currEvidence.append(int(line["Browser"]))
+            currEvidence.append(int(line["Region"]))
+            currEvidence.append(int(line["TrafficType"]))
+            currEvidence.append(1 if line["VisitorType"] == "Returning_Visitor" else 0)
+            currEvidence.append(1 if line["Weekend"] == "TRUE" else 0)
+
+            evidence.append(currEvidence)
+            labels.append(1 if line["Revenue"] == "TRUE" else 0)
+
+    return (evidence, labels)
 
 
 def train_model(evidence, labels):
